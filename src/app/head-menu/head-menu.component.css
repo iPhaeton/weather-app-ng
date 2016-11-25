@@ -1,0 +1,154 @@
+.head-menu {
+  padding: 0 20% 0 20%;
+  background-color: #333;
+}
+
+.head-menu:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.head-menu__panel{
+  margin: 0;
+  padding: 0;
+}
+
+.head-menu__left {
+  float: left;
+}
+
+.head-menu__right {
+  float: right;
+}
+
+.head-menu ul {
+  list-style: none;
+}
+
+.head-menu li {
+  float: left;
+}
+
+.head-menu a {
+  display: inline-block;
+  padding: 15px;
+  text-decoration: none;
+  color: #fff;
+}
+
+.head-menu a:hover {
+  text-decoration: none;
+  color: #fff;
+  background-color: #337ab7;
+}
+
+.head-menu a:focus {
+  text-decoration: none;
+}
+
+.collapse-button {
+  width: 26px;
+  height: 26px;
+  border-radius: 1px;
+  background-color: #333;
+  float: right;
+  margin-top: 8px;
+  margin-right: 15px;
+  margin-bottom: 8px;
+  padding: 1px !important;
+  border: 1px solid #eee;
+}
+
+.collapse-button:hover {
+  background-color: #777;
+  cursor: pointer;
+}
+
+.collapse-button:focus {
+  border: none;
+}
+
+.button-bar {
+  display: block;
+  background-color: #eee;
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  margin: 2px 0 0 2px;
+}
+
+.button-bar + .button-bar {
+  margin: 4px 0 0 2px;
+}
+
+.brand {
+  font-weight: 900;
+  color: #eee;
+  font-size: 20px;
+  padding: 11px 30px 10px 15px !important;
+}
+
+.brand:hover {
+  background-color: #333 !important;
+}
+
+#head-menu__items {
+  transition-property: height;
+  transition-duration: .5s;
+  overflow: hidden;
+}
+
+@media all and (min-width: 641px) {
+  .collapsable  {
+    height: auto !important;
+  }
+
+  .collapsing {
+    display: none;
+  }
+}
+
+@media all and (max-width: 1280px) {
+  .head-menu {
+    padding: 0;
+  }
+}
+
+@media all and (max-width: 640px) {
+  .collapsable  {
+    height: 0;
+  }
+
+  .collapsing {
+    display: block;
+  }
+
+  #head-menu__items {
+    display: block;
+    width: 100%;
+  }
+
+  #head-menu__items:before {
+    content: '';
+    display: block;
+    clear: both;
+  }
+
+  .head-menu__panel {
+    display: block;
+    width: 100%;
+  }
+
+  .head-menu__panel > li {
+    display: block;
+    width: 100%;
+    text-align: center;
+    float: none !important;
+  }
+
+  .head-menu__panel > li > a {
+    display: block;
+    width: 100%;
+  }
+}

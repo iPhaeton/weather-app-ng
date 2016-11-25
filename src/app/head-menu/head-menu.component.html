@@ -1,0 +1,32 @@
+<div class="head-menu" role="navigation">
+
+  <div class="container">
+
+    <div class="head-menu__header head-menu__left">
+      <a href="#" class="brand">WEATHER APP</a>
+    </div>
+
+    <button class="collapse-button collapsing" data-toggle="head-menu__items" (click)="show($event)">
+      <div class="button-bar"></div>
+      <div class="button-bar"></div>
+      <div class="button-bar"></div>
+    </button>
+
+    <div class="collapsable" id="head-menu__items">
+      <ul class="head-menu__left head-menu__panel" *ngIf="itemsLeft.length">
+        <li *ngFor="let item of itemsLeft">
+          <a role="presentation" href="{{item.href}}">{{item.title}}</a>
+        </li>
+      </ul>
+
+      <ul class="head-menu__right head-menu__panel" *ngIf="itemsRight.length">
+        <li *ngFor="let item of itemsRight">
+          <a role="presentation" href="{{item.href}}">{{item.title}}</a>
+        </li>
+      </ul>
+
+    </div>
+
+  </div>
+
+</div>
