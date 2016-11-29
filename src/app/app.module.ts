@@ -7,12 +7,14 @@ import { AppComponent } from './app.component';
 import { HeadMenuComponent } from './head-menu/head-menu.component';
 import { MapComponent } from './map/map.component';
 import { ProvideService } from "./provide.service";
+import { WeatherBoxComponent } from './weather-box/weather-box.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeadMenuComponent,
-    MapComponent
+    MapComponent,
+    WeatherBoxComponent
   ],
   imports: [
     BrowserModule,

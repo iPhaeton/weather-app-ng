@@ -13,6 +13,23 @@ export class NoSupportError extends Error{
 
   name:string = "NoSupportError";
   message:string;
-  prototype = Object.create(Error.prototype);
+}
 
+export class ServerResponseError extends Error{
+  constructor (status, message) {
+    super (message);
+
+    this.message = message;
+    this.responseStatus = status;
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, NoSupportError);
+    } else {
+      this.stack = (new Error()).stack;
+    }
+  }
+
+  name:string = "ServerResponseError";
+  message:string;
+  responseStatus:number;
 }

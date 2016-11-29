@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
-import { NoSupportError } from "./errors/errors";
+import { NoSupportError, ServerResponseError } from "./errors/errors";
 
 @Injectable()
 export class ProvideService {
 
   constructor() {}
 
-  storedLocation: any;
+  _storedLocation: any;
 
+  //location------------------------------------------------------------------------------------------------------------
   location (callback, refresh:boolean = false) {
-    if (this.storedLocation && !refresh) callback(null, this.storedLocation);
+    if (this._storedLocation && !refresh) callback(null, this._storedLocation);
     else this._getLocation((err, pos) => {
       callback(err, pos)
     });
@@ -21,7 +22,7 @@ export class ProvideService {
     };
 
     navigator.geolocation.getCurrentPosition((pos) => {
-      this.storedLocation = pos;
+      this._storedLocation = pos;
       callback(null, pos);
     }, (err) => {
       callback(err);
@@ -30,4 +31,24 @@ export class ProvideService {
     });
   }
 
+  //weather data--------------------------------------------------------------------------------------------------------
+  weather (pos, callback) {
+    var request = new XMLHttpRequest();
+    var url = `http://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&APPID=1087fe193c7a359e56fd688c0da44085`
+    request.open("GET", url, true);
+    request.send();
+
+    request.onload = function () {
+      callback (null, request.responseText);
+    };
+    request. onerror = function () {
+      callback(new ServerResponseError(request.status, request.statusText));
+    }
+  }
+
 }
+
+//make location and weather into getters
+//add index.ts to errors
+//cashing
+//is storing location in a variable necessary?
