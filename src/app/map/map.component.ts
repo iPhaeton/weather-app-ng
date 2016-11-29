@@ -22,7 +22,12 @@ export class MapComponent implements OnInit {
           zoom: 10,
           mapTypeId: googleMaps.MapTypeId.ROADMAP
         };
-        var map = new googleMaps.Map(this.elem.nativeElement.querySelector("#canvas"), mapProperties);
+        this.provide.googleMaps = googleMaps;
+        this.provide.map = new googleMaps.Map(this.elem.nativeElement.querySelector("#canvas"), mapProperties);
+        this.provide.place((err, place) => {
+          if (err) console.log(err);
+          else console.log(place);
+        })
       }, (err) => {
         console.log(err);
       });
