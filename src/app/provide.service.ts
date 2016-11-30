@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { NoSupportError, ServerResponseError, UndefinedLocationError } from "./errors";
+import { LocationInfo } from "./classes/locationInfo";
 
 @Injectable()
 export class ProvideService {
@@ -8,15 +9,14 @@ export class ProvideService {
 
   }
 
-  _googleMaps:any;
-  _map:any;
-  _storedLocation:any;
-  _storedPlace:any;
-  _storedWeatherData:any = null;
+  private _googleMaps:any;
+  private _map:any;
+
+  private locationInfo:LocationInfo = new LocationInfo();
 
   //map-----------------------------------------------------------------------------------------------------------------
   map (elem, callback) {
-    if (!this._storedLocation) return callback(new UndefinedLocationError("Location"));
+    if (!this.locationInfo.position) return callback(new UndefinedLocationError("Location"));
     if (!this._map) this._getMap(elem, callback);
     else callback(null, this._map);
   }
@@ -26,7 +26,7 @@ export class ProvideService {
     googleMapsApi().then((googleMaps) => {
       this._googleMaps = googleMaps;
       var mapProperties = {
-        center: new googleMaps.LatLng(this._storedLocation.coords.latitude, this._storedLocation.coords.longitude),
+        center: new googleMaps.LatLng(this.locationInfo.position.latitude, this.locationInfo.position.longitude),
         zoom: 10,
         mapTypeId: googleMaps.MapTypeId.ROADMAP
       };
@@ -40,7 +40,7 @@ export class ProvideService {
 
   //location------------------------------------------------------------------------------------------------------------
   location (callback, refresh:boolean = false) {
-    if (this._storedLocation && !refresh) callback(null, this._storedLocation);
+    if (this.locationInfo.position && !refresh) callback(null, this.locationInfo.position);
     else this._getLocation(callback);
   }
 
@@ -50,8 +50,11 @@ export class ProvideService {
     };
 
     navigator.geolocation.getCurrentPosition((pos) => {
-      this._storedLocation = pos;
-      callback(null, pos);
+      this.locationInfo.position = {
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude
+      };
+      callback(null, this.locationInfo.position);
     }, (err) => {
       callback(err);
     }, {
@@ -61,28 +64,28 @@ export class ProvideService {
 
   //place---------------------------------------------------------------------------------------------------------------
   place (callback, refresh:boolean = false) {
-    if (this._storedPlace && !refresh) callback(null, this._storedPlace);
+    if (this.locationInfo.place && !refresh) callback(null, this.locationInfo.place);
     else this._getPlace(callback);
   }
 
   _getPlace (callback) {
-    if (!this._storedLocation) return callback(new UndefinedLocationError("Position"));
+    if (!this.locationInfo.position) return callback(new UndefinedLocationError("Position"));
     else if (!this._map) return callback(new UndefinedLocationError("Map"));
     else if (!this._googleMaps) return callback(new UndefinedLocationError("Google maps API"));
 
     var geocoder = new this._googleMaps.Geocoder;
     geocoder.geocode ({
       "location": {
-        lat: this._storedLocation.coords.latitude,
-        lng: this._storedLocation.coords.longitude
+        lat: this.locationInfo.position.latitude,
+        lng: this.locationInfo.position.longitude
       }
     }, (results, status) => {
       if (status === this._googleMaps.GeocoderStatus.OK) {
-        this._storedPlace = this._getCity(results);
-        callback(null, this._storedPlace);
+        this.locationInfo.place = this._getCity(results);
+        callback(null, this.locationInfo.place);
       }
       else if (status === this._googleMaps.GeocoderStatus.ZERO_RESULTS) {
-        this._storedPlace = null;
+        this.locationInfo.place = null;
         callback(null, "No people here");
       }
       else callback(new ServerResponseError(status, "Google maps Api error"));
@@ -100,7 +103,7 @@ export class ProvideService {
 
   //weather data--------------------------------------------------------------------------------------------------------
   weather (pos, callback, refresh:boolean = false) {
-    if (this._storedWeatherData && !refresh) callback(null, this._storedWeatherData);
+    if (this.locationInfo.weather && !refresh) callback(null, this.locationInfo.weather);
     else this._getWeather(pos, callback);
   }
 
@@ -108,17 +111,17 @@ export class ProvideService {
     var self = this;
 
     var request = new XMLHttpRequest();
-    var url = `http://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&APPID=1087fe193c7a359e56fd688c0da44085`
+    var url = `http://api.openweathermap.org/data/2.5/weather?lat=${pos.latitude}&lon=${pos.longitude}&APPID=1087fe193c7a359e56fd688c0da44085`
     request.open("GET", url, true);
     request.send();
 
     request.onload = function () {
-      self._storedWeatherData = request.responseText;
+      self.locationInfo.weather = JSON.parse(request.responseText);
       //clear stored weather data in 10 minutes
       setTimeout(() => {
-        self._storedWeatherData = null;
+        self.locationInfo.weather = null;
       }, 600000);
-      callback (null, self._storedWeatherData);
+      callback (null, self.locationInfo.weather);
     };
     request. onerror = function () {
       callback(new ServerResponseError(request.status, request.statusText));
@@ -126,5 +129,3 @@ export class ProvideService {
   }
 
 }
-
-//make location and weather into getters
