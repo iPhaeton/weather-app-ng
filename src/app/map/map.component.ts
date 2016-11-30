@@ -12,24 +12,16 @@ export class MapComponent implements OnInit {
 
   ngOnInit() {
     this.provide.location((err, pos) => {
-      if (err) console.log(err);
+      if (err) return console.log(err);
       else console.log(pos);
 
-      var googleMapsApi = require("google-maps-api")("AIzaSyBIv5Z7Gmo-glNiiqhTqGfISRr-wTQ3MSE");
-      googleMapsApi().then((googleMaps) => {
-        var mapProperties = {
-          center: new googleMaps.LatLng(pos.coords.latitude, pos.coords.longitude),
-          zoom: 10,
-          mapTypeId: googleMaps.MapTypeId.ROADMAP
-        };
-        this.provide.googleMaps = googleMaps;
-        this.provide.map = new googleMaps.Map(this.elem.nativeElement.querySelector("#canvas"), mapProperties);
+      this.provide.map(this.elem.nativeElement.querySelector("#canvas"), (err, map) => {
+        if (err) return console.log(err);
+
         this.provide.place((err, place) => {
-          if (err) console.log(err);
+          if (err) return console.log(err);
           else console.log(place);
         })
-      }, (err) => {
-        console.log(err);
       });
     });
   }

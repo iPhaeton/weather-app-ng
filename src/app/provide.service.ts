@@ -8,12 +8,35 @@ export class ProvideService {
 
   }
 
-  map:any;
-  googleMaps:any;
-
+  _googleMaps:any;
+  _map:any;
   _storedLocation:any;
   _storedPlace:any;
   _storedWeatherData:any = null;
+
+  //map-----------------------------------------------------------------------------------------------------------------
+  map (elem, callback) {
+    if (!this._storedLocation) return callback(new UndefinedLocationError("Location"));
+    if (!this._map) this._getMap(elem, callback);
+    else callback(null, this._map);
+  }
+
+  _getMap (elem, callback) {
+    var googleMapsApi = require("google-maps-api")("AIzaSyBIv5Z7Gmo-glNiiqhTqGfISRr-wTQ3MSE");
+    googleMapsApi().then((googleMaps) => {
+      this._googleMaps = googleMaps;
+      var mapProperties = {
+        center: new googleMaps.LatLng(this._storedLocation.coords.latitude, this._storedLocation.coords.longitude),
+        zoom: 10,
+        mapTypeId: googleMaps.MapTypeId.ROADMAP
+      };
+
+      this._map = new googleMaps.Map(elem, mapProperties);
+      callback(null, this._map);
+    }, (err) => {
+      callback(err);
+    });
+  }
 
   //location------------------------------------------------------------------------------------------------------------
   location (callback, refresh:boolean = false) {
@@ -44,20 +67,21 @@ export class ProvideService {
 
   _getPlace (callback) {
     if (!this._storedLocation) return callback(new UndefinedLocationError("Position"));
-    else if (!this.map) return callback(new UndefinedLocationError("Map"));
+    else if (!this._map) return callback(new UndefinedLocationError("Map"));
+    else if (!this._googleMaps) return callback(new UndefinedLocationError("Google maps API"));
 
-    var geocoder = new this.googleMaps.Geocoder;
+    var geocoder = new this._googleMaps.Geocoder;
     geocoder.geocode ({
       "location": {
         lat: this._storedLocation.coords.latitude,
         lng: this._storedLocation.coords.longitude
       }
     }, (results, status) => {
-      if (status === this.googleMaps.GeocoderStatus.OK) {
+      if (status === this._googleMaps.GeocoderStatus.OK) {
         this._storedPlace = this._getCity(results);
         callback(null, this._storedPlace);
       }
-      else if (status === this.googleMaps.GeocoderStatus.ZERO_RESULTS) {
+      else if (status === this._googleMaps.GeocoderStatus.ZERO_RESULTS) {
         this._storedPlace = null;
         callback(null, "No people here");
       }
