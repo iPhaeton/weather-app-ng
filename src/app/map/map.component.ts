@@ -21,6 +21,7 @@ export class MapComponent implements OnInit {
         this.provide.place((err, place) => {
           if (err) return console.log(err);
           else console.log(place);
+          this.provide.init();
         })
       });
     });

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { NoSupportError, ServerResponseError, UndefinedLocationError } from "./errors";
-import { LocationInfo } from "./classes/locationInfo";
+import { LocationInfo } from "./classes/LocationInfo";
+import { BehaviorSubject } from "rxjs/BehaviorSubject"
 
 @Injectable()
 export class ProvideService {
@@ -13,6 +14,15 @@ export class ProvideService {
   private _map:any;
 
   private locationInfo:LocationInfo = new LocationInfo();
+
+  //events--------------------------------------------------------------------------------------------------------------
+  private _ready = new BehaviorSubject({ready: false});
+  public ready = this._ready.asObservable();
+
+  init () {
+    this._ready.next({ready: true});
+  }
+  //--------------------------------------------------------------------------------------------------------------------
 
   //map-----------------------------------------------------------------------------------------------------------------
   map (elem, callback) {
@@ -129,3 +139,7 @@ export class ProvideService {
   }
 
 }
+
+//ProvideService initialization
+//can I pass data into a service constructor?
+//think about what I want to use as a place
